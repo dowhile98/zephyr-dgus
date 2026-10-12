@@ -17,8 +17,7 @@
 
 LOG_MODULE_REGISTER(dgus2_hal, CONFIG_LOG_DEFAULT_LEVEL);
 
-static void dgus2_uart_isr(const struct device *uart_dev, void *user_data)
-{
+static void dgus2_uart_isr(const struct device *uart_dev, void *user_data) {
 	const struct device *dev = (const struct device *)user_data;
 	if (!dev) {
 		return;
@@ -49,8 +48,7 @@ static void dgus2_uart_isr(const struct device *uart_dev, void *user_data)
 	}
 }
 
-int dgus2_hal_init(const struct device *dev)
-{
+int dgus2_hal_init(const struct device *dev) {
 	if (!dev) {
 		return -EINVAL;
 	}
@@ -77,8 +75,7 @@ int dgus2_hal_init(const struct device *dev)
 	return 0;
 }
 
-int dgus2_hal_tx_bytes(const struct device *dev, const uint8_t *data, size_t len)
-{
+int dgus2_hal_tx_bytes(const struct device *dev, const uint8_t *data, size_t len) {
 	if (!dev || !data || len == 0) {
 		return -EINVAL;
 	}
@@ -100,8 +97,7 @@ int dgus2_hal_tx_bytes(const struct device *dev, const uint8_t *data, size_t len
 	return 0;
 }
 
-int dgus2_hal_get_byte(const struct device *dev, uint8_t *byte, k_timeout_t timeout)
-{
+int dgus2_hal_get_byte(const struct device *dev, uint8_t *byte, k_timeout_t timeout) {
 	if (!dev || !byte) {
 		return -EINVAL;
 	}

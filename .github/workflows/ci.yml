@@ -119,10 +119,12 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y doxygen graphviz
-          pip install -r doc/requirements.txt
+          python -m pip install --upgrade pip
+          python -m pip install -r doc/requirements.txt
 
       - name: Build Documentation
         run: |
+          chmod +x ./scripts/build-docs.sh
           ./scripts/build-docs.sh
 
       - name: Upload HTML Documentation

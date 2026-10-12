@@ -14,19 +14,18 @@
  * Verifies that VP 0x1000 with payload [0x01, 0x02] produces:
  * 5A A5 05 82 10 00 01 02 (total 8 bytes).
  */
-ZTEST(protocol_builder, test_build_write_vp_valid)
-{
+ZTEST(protocol_builder, test_build_write_vp_valid) {
 	uint8_t buf[32];
 	size_t out_len = 0;
 	const uint8_t payload[] = {0x01, 0x02};
 	const uint8_t expected[] = {0x5A, 0xA5, 0x05, 0x82, 0x10, 0x00, 0x01, 0x02};
 
-	int ret = dgus2_protocol_build_write_vp(buf, sizeof(buf), &out_len, 0x1000, payload,
-						sizeof(payload));
+	int ret = dgus2_protocol_build_write_vp(
+	    buf, sizeof(buf), &out_len, 0x1000, payload, sizeof(payload));
 
 	zassert_equal(ret, 0, "Expected return 0, got %d", ret);
-	zassert_equal(out_len, sizeof(expected), "Expected len %zu, got %zu", sizeof(expected),
-		      out_len);
+	zassert_equal(
+	    out_len, sizeof(expected), "Expected len %zu, got %zu", sizeof(expected), out_len);
 	zassert_mem_equal(buf, expected, sizeof(expected), "Buffer content mismatch");
 }
 
@@ -36,14 +35,13 @@ ZTEST(protocol_builder, test_build_write_vp_valid)
  * Verifies that -ENOBUFS is returned when the destination buffer is smaller
  * than the required frame size.
  */
-ZTEST(protocol_builder, test_build_write_vp_buffer_overflow)
-{
+ZTEST(protocol_builder, test_build_write_vp_buffer_overflow) {
 	uint8_t buf[7]; /* Needs 8 bytes for 2-byte payload */
 	size_t out_len = 0;
 	const uint8_t payload[] = {0x01, 0x02};
 
-	int ret = dgus2_protocol_build_write_vp(buf, sizeof(buf), &out_len, 0x1000, payload,
-						sizeof(payload));
+	int ret = dgus2_protocol_build_write_vp(
+	    buf, sizeof(buf), &out_len, 0x1000, payload, sizeof(payload));
 
 	zassert_equal(ret, -ENOBUFS, "Expected -ENOBUFS (%d), got %d", -ENOBUFS, ret);
 }
@@ -53,27 +51,26 @@ ZTEST(protocol_builder, test_build_write_vp_buffer_overflow)
  *
  * Verifies that -EINVAL is returned when NULL pointers are passed.
  */
-ZTEST(protocol_builder, test_build_write_vp_invalid_params)
-{
+ZTEST(protocol_builder, test_build_write_vp_invalid_params) {
 	uint8_t buf[32];
 	size_t out_len = 0;
 	const uint8_t payload[] = {0x01, 0x02};
 
 	/* NULL output buffer */
-	int ret = dgus2_protocol_build_write_vp(NULL, sizeof(buf), &out_len, 0x1000, payload,
-						sizeof(payload));
+	int ret = dgus2_protocol_build_write_vp(
+	    NULL, sizeof(buf), &out_len, 0x1000, payload, sizeof(payload));
 	zassert_equal(ret, -EINVAL, "Expected -EINVAL for NULL buf, got %d", ret);
 
 	/* NULL out_len pointer */
-	ret = dgus2_protocol_build_write_vp(buf, sizeof(buf), NULL, 0x1000, payload,
-					    sizeof(payload));
+	ret =
+	    dgus2_protocol_build_write_vp(buf, sizeof(buf), NULL, 0x1000, payload, sizeof(payload));
 	zassert_equal(ret, -EINVAL, "Expected -EINVAL for NULL out_len, got %d", ret);
 
 	/* NULL data pointer with data_len > 0 */
-	ret = dgus2_protocol_build_write_vp(buf, sizeof(buf), &out_len, 0x1000, NULL,
-					    sizeof(payload));
-	zassert_equal(ret, -EINVAL, "Expected -EINVAL for NULL data with data_len > 0, got %d",
-		      ret);
+	ret = dgus2_protocol_build_write_vp(
+	    buf, sizeof(buf), &out_len, 0x1000, NULL, sizeof(payload));
+	zassert_equal(
+	    ret, -EINVAL, "Expected -EINVAL for NULL data with data_len > 0, got %d", ret);
 
 	/* NULL data with data_len == 0 is valid (0-length payload) */
 	ret = dgus2_protocol_build_write_vp(buf, sizeof(buf), &out_len, 0x1000, NULL, 0);
@@ -87,8 +84,7 @@ ZTEST(protocol_builder, test_build_write_vp_invalid_params)
  * Verifies that VP 0x2000 with 2 words produces:
  * 5A A5 04 83 20 00 02 (total 7 bytes).
  */
-ZTEST(protocol_builder, test_build_read_vp_valid)
-{
+ZTEST(protocol_builder, test_build_read_vp_valid) {
 	uint8_t buf[32];
 	size_t out_len = 0;
 	const uint8_t expected[] = {0x5A, 0xA5, 0x04, 0x83, 0x20, 0x00, 0x02};
@@ -96,8 +92,8 @@ ZTEST(protocol_builder, test_build_read_vp_valid)
 	int ret = dgus2_protocol_build_read_vp(buf, sizeof(buf), &out_len, 0x2000, 2);
 
 	zassert_equal(ret, 0, "Expected return 0, got %d", ret);
-	zassert_equal(out_len, sizeof(expected), "Expected len %zu, got %zu", sizeof(expected),
-		      out_len);
+	zassert_equal(
+	    out_len, sizeof(expected), "Expected len %zu, got %zu", sizeof(expected), out_len);
 	zassert_mem_equal(buf, expected, sizeof(expected), "Buffer content mismatch");
 }
 
@@ -106,8 +102,7 @@ ZTEST(protocol_builder, test_build_read_vp_valid)
  *
  * Verifies that requesting 0 words returns -EINVAL.
  */
-ZTEST(protocol_builder, test_build_read_vp_zero_words)
-{
+ZTEST(protocol_builder, test_build_read_vp_zero_words) {
 	uint8_t buf[32];
 	size_t out_len = 0;
 
@@ -119,8 +114,7 @@ ZTEST(protocol_builder, test_build_read_vp_zero_words)
 /**
  * @brief Test buffer overflow prevention for VP read command.
  */
-ZTEST(protocol_builder, test_build_read_vp_buffer_overflow)
-{
+ZTEST(protocol_builder, test_build_read_vp_buffer_overflow) {
 	uint8_t buf[6]; /* Needs 7 bytes */
 	size_t out_len = 0;
 
@@ -132,8 +126,7 @@ ZTEST(protocol_builder, test_build_read_vp_buffer_overflow)
 /**
  * @brief Test input validation for VP read command.
  */
-ZTEST(protocol_builder, test_build_read_vp_invalid_params)
-{
+ZTEST(protocol_builder, test_build_read_vp_invalid_params) {
 	uint8_t buf[32];
 	size_t out_len = 0;
 
@@ -150,33 +143,31 @@ ZTEST(protocol_builder, test_build_read_vp_invalid_params)
  * Verifies that writing to register page 0x00, address 0x82 with payload [0x55] produces:
  * 5A A5 04 80 00 82 55 (total 7 bytes).
  */
-ZTEST(protocol_builder, test_build_write_reg_valid)
-{
+ZTEST(protocol_builder, test_build_write_reg_valid) {
 	uint8_t buf[32];
 	size_t out_len = 0;
 	const uint8_t data[] = {0x55};
 	const uint8_t expected[] = {0x5A, 0xA5, 0x04, 0x80, 0x00, 0x82, 0x55};
 
-	int ret = dgus2_protocol_build_write_reg(buf, sizeof(buf), &out_len, 0x00, 0x82, data,
-						 sizeof(data));
+	int ret = dgus2_protocol_build_write_reg(
+	    buf, sizeof(buf), &out_len, 0x00, 0x82, data, sizeof(data));
 
 	zassert_equal(ret, 0, "Expected return 0, got %d", ret);
-	zassert_equal(out_len, sizeof(expected), "Expected len %zu, got %zu", sizeof(expected),
-		      out_len);
+	zassert_equal(
+	    out_len, sizeof(expected), "Expected len %zu, got %zu", sizeof(expected), out_len);
 	zassert_mem_equal(buf, expected, sizeof(expected), "Buffer content mismatch");
 }
 
 /**
  * @brief Test buffer overflow prevention for Register write command.
  */
-ZTEST(protocol_builder, test_build_write_reg_buffer_overflow)
-{
+ZTEST(protocol_builder, test_build_write_reg_buffer_overflow) {
 	uint8_t buf[6]; /* Needs 7 bytes for 1-byte payload */
 	size_t out_len = 0;
 	const uint8_t data[] = {0x55};
 
-	int ret = dgus2_protocol_build_write_reg(buf, sizeof(buf), &out_len, 0x00, 0x82, data,
-						 sizeof(data));
+	int ret = dgus2_protocol_build_write_reg(
+	    buf, sizeof(buf), &out_len, 0x00, 0x82, data, sizeof(data));
 
 	zassert_equal(ret, -ENOBUFS, "Expected -ENOBUFS (%d), got %d", -ENOBUFS, ret);
 }
@@ -184,24 +175,23 @@ ZTEST(protocol_builder, test_build_write_reg_buffer_overflow)
 /**
  * @brief Test input validation for Register write command.
  */
-ZTEST(protocol_builder, test_build_write_reg_invalid_params)
-{
+ZTEST(protocol_builder, test_build_write_reg_invalid_params) {
 	uint8_t buf[32];
 	size_t out_len = 0;
 	const uint8_t data[] = {0x55};
 
-	int ret = dgus2_protocol_build_write_reg(NULL, sizeof(buf), &out_len, 0x00, 0x82, data,
-						 sizeof(data));
+	int ret = dgus2_protocol_build_write_reg(
+	    NULL, sizeof(buf), &out_len, 0x00, 0x82, data, sizeof(data));
 	zassert_equal(ret, -EINVAL, "Expected -EINVAL for NULL buf, got %d", ret);
 
-	ret = dgus2_protocol_build_write_reg(buf, sizeof(buf), NULL, 0x00, 0x82, data,
-					     sizeof(data));
+	ret =
+	    dgus2_protocol_build_write_reg(buf, sizeof(buf), NULL, 0x00, 0x82, data, sizeof(data));
 	zassert_equal(ret, -EINVAL, "Expected -EINVAL for NULL out_len, got %d", ret);
 
-	ret = dgus2_protocol_build_write_reg(buf, sizeof(buf), &out_len, 0x00, 0x82, NULL,
-					     sizeof(data));
-	zassert_equal(ret, -EINVAL, "Expected -EINVAL for NULL data with data_len > 0, got %d",
-		      ret);
+	ret = dgus2_protocol_build_write_reg(
+	    buf, sizeof(buf), &out_len, 0x00, 0x82, NULL, sizeof(data));
+	zassert_equal(
+	    ret, -EINVAL, "Expected -EINVAL for NULL data with data_len > 0, got %d", ret);
 }
 
 /**
@@ -209,19 +199,18 @@ ZTEST(protocol_builder, test_build_write_reg_invalid_params)
  *
  * Format: 5A A5 [LEN] 80 [REG_PAGE] [REG_ADDR] [DATA...]
  */
-ZTEST(protocol_builder, test_build_write_reg_page)
-{
+ZTEST(protocol_builder, test_build_write_reg_page) {
 	uint8_t buf[32];
 	size_t out_len = 0;
 	const uint8_t data[] = {0x55, 0xAA};
 	const uint8_t expected[] = {0x5A, 0xA5, 0x05, 0x80, 0x01, 0x20, 0x55, 0xAA};
 
-	int ret = dgus2_protocol_build_write_reg(buf, sizeof(buf), &out_len, 0x01, 0x20, data,
-						 sizeof(data));
+	int ret = dgus2_protocol_build_write_reg(
+	    buf, sizeof(buf), &out_len, 0x01, 0x20, data, sizeof(data));
 
 	zassert_equal(ret, 0, "Expected return 0, got %d", ret);
-	zassert_equal(out_len, sizeof(expected), "Expected len %zu, got %zu", sizeof(expected),
-		      out_len);
+	zassert_equal(
+	    out_len, sizeof(expected), "Expected len %zu, got %zu", sizeof(expected), out_len);
 	zassert_mem_equal(buf, expected, sizeof(expected), "Buffer content mismatch");
 }
 
@@ -230,8 +219,7 @@ ZTEST(protocol_builder, test_build_write_reg_page)
  *
  * Format: 5A A5 04 81 [REG_PAGE] [REG_ADDR] [LEN] (total 7 bytes).
  */
-ZTEST(protocol_builder, test_build_read_reg)
-{
+ZTEST(protocol_builder, test_build_read_reg) {
 	uint8_t buf[32];
 	size_t out_len = 0;
 	const uint8_t expected[] = {0x5A, 0xA5, 0x04, 0x81, 0x00, 0x0A, 0x04};
@@ -239,8 +227,8 @@ ZTEST(protocol_builder, test_build_read_reg)
 	int ret = dgus2_protocol_build_read_reg(buf, sizeof(buf), &out_len, 0x00, 0x0A, 0x04);
 
 	zassert_equal(ret, 0, "Expected return 0, got %d", ret);
-	zassert_equal(out_len, sizeof(expected), "Expected len %zu, got %zu", sizeof(expected),
-		      out_len);
+	zassert_equal(
+	    out_len, sizeof(expected), "Expected len %zu, got %zu", sizeof(expected), out_len);
 	zassert_mem_equal(buf, expected, sizeof(expected), "Buffer content mismatch");
 
 	/* Buffer overflow check: 7 bytes needed */
@@ -264,8 +252,7 @@ ZTEST(protocol_builder, test_build_read_reg)
  * Format: 5A A5 [LEN] 84 [CHANNEL] [POINT0_MSB] [POINT0_LSB] ...
  * LEN = CMD(1) + CHANNEL(1) + 2*COUNT
  */
-ZTEST(protocol_builder, test_build_write_curve)
-{
+ZTEST(protocol_builder, test_build_write_curve) {
 	uint8_t buf[32];
 	size_t out_len = 0;
 	const uint16_t points[] = {0x0010, 0x03E8};
@@ -274,8 +261,8 @@ ZTEST(protocol_builder, test_build_write_curve)
 	int ret = dgus2_protocol_build_write_curve(buf, sizeof(buf), &out_len, 0x01, points, 2);
 
 	zassert_equal(ret, 0, "Expected return 0, got %d", ret);
-	zassert_equal(out_len, sizeof(expected), "Expected len %zu, got %zu", sizeof(expected),
-		      out_len);
+	zassert_equal(
+	    out_len, sizeof(expected), "Expected len %zu, got %zu", sizeof(expected), out_len);
 	zassert_mem_equal(buf, expected, sizeof(expected), "Buffer content mismatch");
 
 	/* Buffer overflow check: 9 bytes needed */
@@ -301,8 +288,7 @@ ZTEST(protocol_builder, test_build_write_curve)
  *
  * Polynomial 0xA001, initial value 0xFFFF.
  */
-ZTEST(protocol_builder, test_protocol_crc16)
-{
+ZTEST(protocol_builder, test_protocol_crc16) {
 	/* Standard Modbus test vector: "123456789" -> 0x4B37 */
 	const uint8_t modbus_vec[] = "123456789";
 	uint16_t crc = dgus2_protocol_crc16(modbus_vec, 9);

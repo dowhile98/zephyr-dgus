@@ -44,3 +44,5 @@ __pycache__/
 #
 .venv/
 temp/
+
+CI_FIX_SUMMARY.md

@@ -10,25 +10,27 @@ DOC_DIR="${ROOT_DIR}/doc"
 
 echo "=== Building zephyr-dgus Documentation ==="
 
-# Activate local .venv if available and needed
-if ! command -v sphinx-build &> /dev/null; then
-    if [[ -f "${ROOT_DIR}/.venv/bin/activate" ]]; then
-        echo "Activating documentation virtual environment at ${ROOT_DIR}/.venv..."
-        # shellcheck disable=SC1091
-        source "${ROOT_DIR}/.venv/bin/activate"
-    fi
-fi
-
 # Check requirements
 if ! command -v doxygen &> /dev/null; then
     echo "ERROR: doxygen is not installed or not in PATH."
     exit 1
 fi
 
-if ! command -v sphinx-build &> /dev/null; then
-    echo "ERROR: sphinx-build is not installed or not in PATH."
-    echo "Install dependencies with: pip install -r doc/requirements.txt"
-    exit 1
+# Use python -m sphinx for better compatibility in CI environments
+if ! python -m sphinx --version &> /dev/null; then
+    # Try activating local .venv if available
+    if [[ -f "${ROOT_DIR}/.venv/bin/activate" ]]; then
+        echo "Activating documentation virtual environment at ${ROOT_DIR}/.venv..."
+        # shellcheck disable=SC1091
+        source "${ROOT_DIR}/.venv/bin/activate"
+    fi
+    
+    # Verify again after potential activation
+    if ! python -m sphinx --version &> /dev/null; then
+        echo "ERROR: Sphinx is not installed or not accessible via Python."
+        echo "Install dependencies with: pip install -r doc/requirements.txt"
+        exit 1
+    fi
 fi
 
 echo "1. Generating Doxygen XML and HTML..."
@@ -43,7 +45,7 @@ fi
 
 echo "2. Building Sphinx HTML documentation..."
 rm -rf _build_sphinx
-sphinx-build -b html -d _build_sphinx/doctrees -W --keep-going . _build_sphinx/html
+python -m sphinx -b html -d _build_sphinx/doctrees -W --keep-going . _build_sphinx/html
 
 INDEX_PATH="${DOC_DIR}/_build_sphinx/html/index.html"
 if [[ -f "${INDEX_PATH}" ]]; then

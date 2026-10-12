@@ -128,8 +128,8 @@ int dgus2_write_vp_i32(const struct device *dev, uint16_t vp_addr, int32_t value
  *
  * @note Thread-safe, non-ISR context. May sleep waiting on mutex/semaphore.
  */
-int dgus2_write_vp_bytes(const struct device *dev, uint16_t vp_addr, const uint8_t *data,
-			 uint16_t len);
+int dgus2_write_vp_bytes(
+    const struct device *dev, uint16_t vp_addr, const uint8_t *data, uint16_t len);
 
 /**
  * @brief Writes a null-terminated ASCII string to a VP address.
@@ -169,7 +169,7 @@ int dgus2_write_vp_string(const struct device *dev, uint16_t vp_addr, const char
  * @note Thread-safe, non-ISR context. May sleep waiting on mutex/semaphore.
  */
 int dgus2_read_vp_sync(const struct device *dev, uint16_t vp_addr, uint8_t *out_buf,
-		       uint16_t max_len, uint16_t *out_len, k_timeout_t timeout);
+    uint16_t max_len, uint16_t *out_len, k_timeout_t timeout);
 
 /**
  * @brief Reads an unsigned 16-bit integer (uint16_t) synchronously from a VP address.
@@ -188,8 +188,8 @@ int dgus2_read_vp_sync(const struct device *dev, uint16_t vp_addr, uint8_t *out_
  *
  * @note Thread-safe, non-ISR context. May sleep waiting on mutex/semaphore.
  */
-int dgus2_read_vp_u16_sync(const struct device *dev, uint16_t vp_addr, uint16_t *value,
-			   k_timeout_t timeout);
+int dgus2_read_vp_u16_sync(
+    const struct device *dev, uint16_t vp_addr, uint16_t *value, k_timeout_t timeout);
 
 /**
  * @brief Reads an unsigned 32-bit integer (uint32_t) synchronously from a VP address.
@@ -208,8 +208,8 @@ int dgus2_read_vp_u16_sync(const struct device *dev, uint16_t vp_addr, uint16_t 
  *
  * @note Thread-safe, non-ISR context. May sleep waiting on mutex/semaphore.
  */
-int dgus2_read_vp_u32_sync(const struct device *dev, uint16_t vp_addr, uint32_t *value,
-			   k_timeout_t timeout);
+int dgus2_read_vp_u32_sync(
+    const struct device *dev, uint16_t vp_addr, uint32_t *value, k_timeout_t timeout);
 
 /**
  * @brief Requests an active page switch on the DGUS II display.
@@ -292,8 +292,8 @@ int dgus2_trigger_buzzer(const struct device *dev, uint16_t duration_ms);
  *
  * @note Thread-safe, non-ISR context. May sleep waiting on mutex/semaphore.
  */
-int dgus2_write_curve(const struct device *dev, uint8_t channel, const uint16_t *points,
-		      uint16_t count);
+int dgus2_write_curve(
+    const struct device *dev, uint8_t channel, const uint16_t *points, uint16_t count);
 
 /**
  * @brief Registers an asynchronous notification callback for a VP address.
@@ -312,8 +312,8 @@ int dgus2_write_curve(const struct device *dev, uint8_t channel, const uint16_t 
  *
  * @note Thread-safe, non-ISR context. May sleep waiting on mutex/semaphore.
  */
-int dgus2_register_vp_callback(const struct device *dev, uint16_t vp_addr, dgus2_vp_event_cb_t cb,
-			       void *user_data);
+int dgus2_register_vp_callback(
+    const struct device *dev, uint16_t vp_addr, dgus2_vp_event_cb_t cb, void *user_data);
 
 /**
  * @brief Unregisters a previously registered VP callback.
@@ -330,8 +330,8 @@ int dgus2_register_vp_callback(const struct device *dev, uint16_t vp_addr, dgus2
  *
  * @note Thread-safe, non-ISR context. May sleep waiting on mutex/semaphore.
  */
-int dgus2_unregister_vp_callback(const struct device *dev, uint16_t vp_addr,
-				 dgus2_vp_event_cb_t cb);
+int dgus2_unregister_vp_callback(
+    const struct device *dev, uint16_t vp_addr, dgus2_vp_event_cb_t cb);
 
 /**
  * @brief Returns the cumulative FSM parser error count for diagnostic monitoring.

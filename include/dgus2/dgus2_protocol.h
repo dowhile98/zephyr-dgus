@@ -24,14 +24,14 @@
  * @brief Finite state machine parser states for byte-by-byte frame reception.
  */
 typedef enum {
-	DGUS2_STATE_WAIT_HEADER1,    /**< Waiting for first sync byte (0x5A). */
-	DGUS2_STATE_WAIT_HEADER2,    /**< Waiting for second sync byte (0xA5). */
-	DGUS2_STATE_WAIT_LEN,        /**< Waiting for payload length byte. */
-	DGUS2_STATE_WAIT_CMD,        /**< Waiting for command byte. */
-	DGUS2_STATE_WAIT_VP_MSB,     /**< Waiting for VP address MSB byte. */
-	DGUS2_STATE_WAIT_VP_LSB,     /**< Waiting for VP address LSB byte. */
+	DGUS2_STATE_WAIT_HEADER1, /**< Waiting for first sync byte (0x5A). */
+	DGUS2_STATE_WAIT_HEADER2, /**< Waiting for second sync byte (0xA5). */
+	DGUS2_STATE_WAIT_LEN, /**< Waiting for payload length byte. */
+	DGUS2_STATE_WAIT_CMD, /**< Waiting for command byte. */
+	DGUS2_STATE_WAIT_VP_MSB, /**< Waiting for VP address MSB byte. */
+	DGUS2_STATE_WAIT_VP_LSB, /**< Waiting for VP address LSB byte. */
 	DGUS2_STATE_WAIT_WORD_COUNT, /**< Waiting for word count (read response). */
-	DGUS2_STATE_WAIT_DATA        /**< Collecting payload data bytes. */
+	DGUS2_STATE_WAIT_DATA /**< Collecting payload data bytes. */
 } dgus2_fsm_state_t;
 
 /**
@@ -39,10 +39,10 @@ typedef enum {
  */
 struct dgus2_parser {
 	dgus2_fsm_state_t state; /**< Current parser FSM state. */
-	uint8_t rx_len;          /**< Total frame length expected according to length byte. */
-	uint8_t bytes_read;      /**< Number of payload bytes received so far. */
+	uint8_t rx_len; /**< Total frame length expected according to length byte. */
+	uint8_t bytes_read; /**< Number of payload bytes received so far. */
 	struct dgus2_frame current_frame; /**< Frame being actively assembled. */
-	uint32_t parse_errors;            /**< Cumulative count of parsing errors. */
+	uint32_t parse_errors; /**< Cumulative count of parsing errors. */
 };
 
 /**
@@ -63,8 +63,8 @@ void dgus2_protocol_parser_init(struct dgus2_parser *parser);
  *
  * @note Reentrant, hardware-independent. Deterministic execution time per byte.
  */
-bool dgus2_protocol_parse_byte(struct dgus2_parser *parser, uint8_t byte,
-			       struct dgus2_frame *out_frame);
+bool dgus2_protocol_parse_byte(
+    struct dgus2_parser *parser, uint8_t byte, struct dgus2_frame *out_frame);
 
 /**
  * @brief Builds a VP write frame (Command 0x82).
@@ -83,7 +83,7 @@ bool dgus2_protocol_parse_byte(struct dgus2_parser *parser, uint8_t byte,
  * @retval -ENOSPC If @p max_buf is insufficient to hold the frame.
  */
 int dgus2_protocol_build_write_vp(uint8_t *buf, size_t max_buf, size_t *out_len, uint16_t vp_addr,
-				  const uint8_t *data, uint16_t data_len);
+    const uint8_t *data, uint16_t data_len);
 
 /**
  * @brief Builds a VP read request frame (Command 0x83).
@@ -100,8 +100,8 @@ int dgus2_protocol_build_write_vp(uint8_t *buf, size_t max_buf, size_t *out_len,
  * @retval -EINVAL If parameters are NULL or @p word_count is 0.
  * @retval -ENOSPC If @p max_buf is smaller than required 7 bytes.
  */
-int dgus2_protocol_build_read_vp(uint8_t *buf, size_t max_buf, size_t *out_len, uint16_t vp_addr,
-				 uint8_t word_count);
+int dgus2_protocol_build_read_vp(
+    uint8_t *buf, size_t max_buf, size_t *out_len, uint16_t vp_addr, uint8_t word_count);
 
 /**
  * @brief Builds a system/OS register write frame (Command 0x80).
@@ -121,7 +121,7 @@ int dgus2_protocol_build_read_vp(uint8_t *buf, size_t max_buf, size_t *out_len, 
  * @retval -ENOSPC If @p max_buf is insufficient.
  */
 int dgus2_protocol_build_write_reg(uint8_t *buf, size_t max_buf, size_t *out_len, uint8_t reg_page,
-				   uint8_t reg_addr, const uint8_t *data, uint16_t data_len);
+    uint8_t reg_addr, const uint8_t *data, uint16_t data_len);
 
 /**
  * @brief Builds a system/OS register read request frame (Command 0x81).
@@ -139,8 +139,8 @@ int dgus2_protocol_build_write_reg(uint8_t *buf, size_t max_buf, size_t *out_len
  * @retval -EINVAL If parameters are NULL or invalid.
  * @retval -ENOSPC If @p max_buf is smaller than 7 bytes.
  */
-int dgus2_protocol_build_read_reg(uint8_t *buf, size_t max_buf, size_t *out_len, uint8_t reg_page,
-				  uint8_t reg_addr, uint8_t len);
+int dgus2_protocol_build_read_reg(
+    uint8_t *buf, size_t max_buf, size_t *out_len, uint8_t reg_page, uint8_t reg_addr, uint8_t len);
 
 /**
  * @brief Builds a real-time trend curve write frame (Command 0x84).
@@ -159,7 +159,7 @@ int dgus2_protocol_build_read_reg(uint8_t *buf, size_t max_buf, size_t *out_len,
  * @retval -ENOSPC If @p max_buf is insufficient.
  */
 int dgus2_protocol_build_write_curve(uint8_t *buf, size_t max_buf, size_t *out_len, uint8_t channel,
-				     const uint16_t *points, uint16_t count);
+    const uint16_t *points, uint16_t count);
 
 /**
  * @brief Calculates CRC-16 Modbus (polynomial 0xA001, initial value 0xFFFF).

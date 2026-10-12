@@ -17,9 +17,8 @@ LOG_MODULE_REGISTER(dwin_sample, LOG_LEVEL_INF);
 /*
  * Callback para eventos táctiles (VP 0x3000)
  */
-static void on_touch_button_press(uint16_t vp_addr, const uint8_t *data, uint16_t len,
-				  void *user_data)
-{
+static void on_touch_button_press(
+    uint16_t vp_addr, const uint8_t *data, uint16_t len, void *user_data) {
 	ARG_UNUSED(user_data);
 
 	LOG_INF("Touch event received on VP: 0x%04X, len: %u", vp_addr, len);
@@ -30,8 +29,7 @@ static void on_touch_button_press(uint16_t vp_addr, const uint8_t *data, uint16_
 	}
 }
 
-int main(void)
-{
+int main(void) {
 	const struct device *const dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_dgus));
 	int ret;
 
@@ -94,8 +92,8 @@ int main(void)
 	ret = dgus2_get_page_sync(dev, &current_page, K_MSEC(500));
 	if (ret < 0) {
 		LOG_INF("Sync page query timeout/unanswered (normal if no physical display "
-			"attached): %d",
-			ret);
+		        "attached): %d",
+		    ret);
 	} else {
 		LOG_INF("Sync page confirmed: %u", current_page);
 	}
@@ -104,7 +102,7 @@ int main(void)
 	LOG_INF("Entering periodic telemetry update loop...");
 
 	int16_t temp_celsius_x10 = 245; /* 24.5 °C */
-	uint16_t pressure_hpa = 1013;   /* 1013 hPa */
+	uint16_t pressure_hpa = 1013; /* 1013 hPa */
 	uint32_t uptime_sec = 0;
 	uint16_t curve_base = 100;
 
@@ -122,10 +120,10 @@ int main(void)
 
 		/* Trazado de puntos de curva en tiempo real en canal 0 */
 		uint16_t curve_pts[4] = {
-			(uint16_t)(curve_base + 10),
-			(uint16_t)(curve_base + 25),
-			(uint16_t)(curve_base - 10),
-			(uint16_t)(curve_base + 5),
+		    (uint16_t)(curve_base + 10),
+		    (uint16_t)(curve_base + 25),
+		    (uint16_t)(curve_base - 10),
+		    (uint16_t)(curve_base + 5),
 		};
 		dgus2_write_curve(dev, 0, curve_pts, 4);
 		curve_base = (curve_base + 15) % 400;
@@ -134,9 +132,9 @@ int main(void)
 		uint32_t parse_errors = dgus2_get_parse_error_count(dev);
 
 		LOG_INF("Telemetry: Uptime=%us, Temp=%d.%d C, Press=%u hPa | Parse Errors=%u",
-			uptime_sec, temp_celsius_x10 / 10,
-			(temp_celsius_x10 < 0 ? -temp_celsius_x10 : temp_celsius_x10) % 10,
-			pressure_hpa, parse_errors);
+		    uptime_sec, temp_celsius_x10 / 10,
+		    (temp_celsius_x10 < 0 ? -temp_celsius_x10 : temp_celsius_x10) % 10,
+		    pressure_hpa, parse_errors);
 
 		k_sleep(K_SECONDS(1));
 	}

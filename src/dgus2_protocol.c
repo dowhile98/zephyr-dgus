@@ -9,8 +9,7 @@
 #include <string.h>
 #include <errno.h>
 
-void dgus2_protocol_parser_init(struct dgus2_parser *parser)
-{
+void dgus2_protocol_parser_init(struct dgus2_parser *parser) {
 	if (!parser) {
 		return;
 	}
@@ -19,9 +18,8 @@ void dgus2_protocol_parser_init(struct dgus2_parser *parser)
 	parser->state = DGUS2_STATE_WAIT_HEADER1;
 }
 
-bool dgus2_protocol_parse_byte(struct dgus2_parser *parser, uint8_t byte,
-			       struct dgus2_frame *out_frame)
-{
+bool dgus2_protocol_parse_byte(
+    struct dgus2_parser *parser, uint8_t byte, struct dgus2_frame *out_frame) {
 	if (!parser || !out_frame) {
 		return false;
 	}
@@ -76,8 +74,8 @@ bool dgus2_protocol_parse_byte(struct dgus2_parser *parser, uint8_t byte,
 			/* Trama de longitud 3 (CMD + 2 bytes):
 			 * Comprobar si es ACK ('OK' = 0x4F4B) */
 			if ((parser->current_frame.cmd == DGUS2_CMD_WRITE_VP ||
-			     parser->current_frame.cmd == DGUS2_CMD_WRITE_REG ||
-			     parser->current_frame.cmd == DGUS2_CMD_WRITE_CURVE) &&
+			        parser->current_frame.cmd == DGUS2_CMD_WRITE_REG ||
+			        parser->current_frame.cmd == DGUS2_CMD_WRITE_CURVE) &&
 			    (parser->current_frame.vp_addr == 0x4F4B)) {
 				parser->current_frame.is_ack = true;
 				parser->current_frame.vp_addr = 0;
@@ -133,8 +131,7 @@ bool dgus2_protocol_parse_byte(struct dgus2_parser *parser, uint8_t byte,
 }
 
 int dgus2_protocol_build_write_vp(uint8_t *buf, size_t max_buf, size_t *out_len, uint16_t vp_addr,
-				  const uint8_t *data, uint16_t data_len)
-{
+    const uint8_t *data, uint16_t data_len) {
 	if (!buf || !out_len || (data_len > 0 && !data)) {
 		return -EINVAL;
 	}
@@ -149,7 +146,7 @@ int dgus2_protocol_build_write_vp(uint8_t *buf, size_t max_buf, size_t *out_len,
 	buf[1] = DGUS2_HEADER2;
 	buf[2] = (uint8_t)(3 + data_len); /* LEN = CMD(1) + VP(2) + DATA */
 	buf[3] = DGUS2_CMD_WRITE_VP;
-	buf[4] = (uint8_t)(vp_addr >> 8);   /* VP MSB */
+	buf[4] = (uint8_t)(vp_addr >> 8); /* VP MSB */
 	buf[5] = (uint8_t)(vp_addr & 0xFF); /* VP LSB */
 
 	if (data_len > 0) {
@@ -160,9 +157,8 @@ int dgus2_protocol_build_write_vp(uint8_t *buf, size_t max_buf, size_t *out_len,
 	return 0;
 }
 
-int dgus2_protocol_build_read_vp(uint8_t *buf, size_t max_buf, size_t *out_len, uint16_t vp_addr,
-				 uint8_t word_count)
-{
+int dgus2_protocol_build_read_vp(
+    uint8_t *buf, size_t max_buf, size_t *out_len, uint16_t vp_addr, uint8_t word_count) {
 	if (!buf || !out_len || word_count == 0) {
 		return -EINVAL;
 	}
@@ -186,8 +182,7 @@ int dgus2_protocol_build_read_vp(uint8_t *buf, size_t max_buf, size_t *out_len, 
 }
 
 int dgus2_protocol_build_write_reg(uint8_t *buf, size_t max_buf, size_t *out_len, uint8_t reg_page,
-				   uint8_t reg_addr, const uint8_t *data, uint16_t data_len)
-{
+    uint8_t reg_addr, const uint8_t *data, uint16_t data_len) {
 	if (!buf || !out_len || (data_len > 0 && !data)) {
 		return -EINVAL;
 	}
@@ -215,8 +210,7 @@ int dgus2_protocol_build_write_reg(uint8_t *buf, size_t max_buf, size_t *out_len
 }
 
 int dgus2_protocol_build_read_reg(uint8_t *buf, size_t max_buf, size_t *out_len, uint8_t reg_page,
-				  uint8_t reg_addr, uint8_t len)
-{
+    uint8_t reg_addr, uint8_t len) {
 	if (!buf || !out_len || len == 0) {
 		return -EINVAL;
 	}
@@ -240,8 +234,7 @@ int dgus2_protocol_build_read_reg(uint8_t *buf, size_t max_buf, size_t *out_len,
 }
 
 int dgus2_protocol_build_write_curve(uint8_t *buf, size_t max_buf, size_t *out_len, uint8_t channel,
-				     const uint16_t *points, uint16_t count)
-{
+    const uint16_t *points, uint16_t count) {
 	if (!buf || !out_len || !points || count == 0) {
 		return -EINVAL;
 	}
@@ -268,8 +261,7 @@ int dgus2_protocol_build_write_curve(uint8_t *buf, size_t max_buf, size_t *out_l
 	return 0;
 }
 
-uint16_t dgus2_protocol_crc16(const uint8_t *data, size_t len)
-{
+uint16_t dgus2_protocol_crc16(const uint8_t *data, size_t len) {
 	if (!data || len == 0) {
 		return 0;
 	}
