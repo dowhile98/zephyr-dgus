@@ -47,12 +47,21 @@ echo "2. Building Sphinx HTML documentation..."
 rm -rf _build_sphinx
 python -m sphinx -b html -d _build_sphinx/doctrees -W --keep-going . _build_sphinx/html
 
+if [[ -d "${DOC_DIR}/_build_doxygen/html" ]]; then
+    echo "3. Copying Doxygen HTML into Sphinx HTML output directory..."
+    mkdir -p "${DOC_DIR}/_build_sphinx/html/doxygen"
+    cp -r "${DOC_DIR}/_build_doxygen/html/." "${DOC_DIR}/_build_sphinx/html/doxygen/"
+fi
+
 INDEX_PATH="${DOC_DIR}/_build_sphinx/html/index.html"
 if [[ -f "${INDEX_PATH}" ]]; then
     echo ""
     echo "============================================================"
     echo "SUCCESS: Documentation build completed successfully!"
     echo "Open index in your browser: file://${INDEX_PATH}"
+    if [[ -d "${DOC_DIR}/_build_sphinx/html/doxygen" ]]; then
+        echo "Doxygen documentation:     file://${DOC_DIR}/_build_sphinx/html/doxygen/index.html"
+    fi
     echo "============================================================"
     exit 0
 else
