@@ -17,11 +17,16 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
       - name: Install clang-format
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y clang-format
+        run: pip install clang-format
 
       - name: Check code formatting
         run: |
@@ -31,23 +36,27 @@ jobs:
   twister-tests:
     name: Twister Tests (native_sim)
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/zephyrproject-rtos/ci:v0.27.4
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           path: zephyr-dgus
+          persist-credentials: false
 
-      - name: Initialize West workspace
-        run: |
-          west init -l zephyr-dgus
-          west update --narrow --depth=1
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Setup Zephyr project
+        uses: zephyrproject-rtos/action-zephyr-setup@v1
+        with:
+          app-path: zephyr-dgus
 
       - name: Run Twister Unit Tests
+        working-directory: zephyr-dgus
         run: |
-          cd zephyr-dgus
-          west twister -T tests/ -p native_sim --verbose
+          west twister -T tests/ -p native_sim -v --inline-logs --integration
 
       - name: Upload Twister Test Artifacts
         uses: actions/upload-artifact@v4
@@ -56,13 +65,11 @@ jobs:
           name: twister-reports
           path: |
             zephyr-dgus/twister-out/twister.json
-            zephyr-dgus/twister-out/twister_report.xml
+            zephyr-dgus/twister-out/*/twister_report.xml
 
   sample-builds:
     name: Sample Build (${{ matrix.target }})
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/zephyrproject-rtos/ci:v0.27.4
     strategy:
       fail-fast: false
       matrix:
@@ -76,15 +83,22 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: zephyr-dgus
+          persist-credentials: false
 
-      - name: Initialize West workspace
-        run: |
-          west init -l zephyr-dgus
-          west update --narrow --depth=1
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Setup Zephyr project
+        uses: zephyrproject-rtos/action-zephyr-setup@v1
+        with:
+          app-path: zephyr-dgus
+          toolchains: arm-zephyr-eabi
 
       - name: Build Sample Application
+        working-directory: zephyr-dgus
         run: |
-          cd zephyr-dgus
           west build -b ${{ matrix.target }} samples/dwin-interface/ -p auto
 
   documentation:
@@ -93,12 +107,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: "pip"
 
       - name: Install documentation tools
         run: |
@@ -112,6 +127,7 @@ jobs:
 
       - name: Upload HTML Documentation
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: doc-html
           path: doc/_build_sphinx/html/
