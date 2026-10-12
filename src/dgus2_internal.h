@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2026 DAECGE TECNA SMART LAB
+ * Copyright (c) 2026 StructCore Embedded
  * SPDX-License-Identifier: Apache-2.0
  *
  * Definiciones y estructuras internas privadas del driver DGUS II.

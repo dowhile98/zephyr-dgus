@@ -5,8 +5,8 @@
 
 # -- Project information -----------------------------------------------------
 project = 'zephyr-dgus'
-copyright = '2026, DAECGE TECNA SMART LAB'
-author = 'DAECGE TECNA SMART LAB'
+copyright = '2026, StructCore Embedded'
+author = 'StructCore Embedded'
 release = '1.0.0'
 
 # -- General configuration ---------------------------------------------------
