@@ -1,0 +1,29 @@
+sample:
+  name: DWIN DGUS II Display Interface Sample
+  description: Demonstrates DGUS II (DWIN T5L) driver with UART telemetry, touch events, and curve rendering.
+common:
+  tags:
+    - display
+    - dwin
+    - dgus2
+    - uart
+  harness: console
+  harness_config:
+    type: one_line
+    regex:
+      - "DWIN DGUS II \\(T5L\\) Intelligent Display Sample"
+  integration_platforms:
+    - native_sim
+    - stm32f4_disco
+    - nucleo_f429zi
+    - nucleo_h753zi
+tests:
+  sample.display.dwin_interface:
+    platform_allow:
+      - native_sim
+      - stm32f4_disco
+      - nucleo_f429zi
+      - nucleo_h753zi
+    tags:
+      - display
+      - dwin

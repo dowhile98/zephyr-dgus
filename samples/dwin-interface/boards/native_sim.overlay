@@ -1,0 +1,17 @@
+/*
+ * Copyright (c) 2026 DAECGE TECNA SMART LAB
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/ {
+	chosen {
+		zephyr,dgus = &dwin_screen;
+	};
+
+	dwin_screen: dgus2 {
+		compatible = "dwin,dgus2";
+		uart = <&uart0>;
+		status = "okay";
+		current-speed = <115200>;
+	};
+};

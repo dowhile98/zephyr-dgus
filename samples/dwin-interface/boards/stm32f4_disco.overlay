@@ -1,0 +1,24 @@
+/*
+ * Copyright (c) 2026 DAECGE TECNA SMART LAB
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/ {
+	chosen {
+		zephyr,dgus = &dwin_screen;
+	};
+
+	dwin_screen: dgus2 {
+		compatible = "dwin,dgus2";
+		uart = <&usart2>;
+		status = "okay";
+		current-speed = <115200>;
+	};
+};
+
+&usart2 {
+	status = "okay";
+	current-speed = <115200>;
+	pinctrl-0 = <&usart2_tx_pa2 &usart2_rx_pa3>;
+	pinctrl-names = "default";
+};

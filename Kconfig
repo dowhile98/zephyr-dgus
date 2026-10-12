@@ -1,0 +1,51 @@
+# Copyright (c) 2026 DAECGE TECNA SMART LAB
+# SPDX-License-Identifier: Apache-2.0
+
+menuconfig DGUS2_DRIVER
+	bool "DGUS II DWIN Display Driver Module"
+	default n
+	depends on SERIAL
+	select UART_INTERRUPT_DRIVEN
+	help
+	  Habilita el módulo driver para pantallas DWIN DGUS II (T5L) a través de UART.
+	  Requiere UART interrupt-driven (CONFIG_UART_INTERRUPT_DRIVEN).
+
+if DGUS2_DRIVER
+
+module = DGUS2
+module-str = dgus2
+source "subsys/logging/Kconfig.template.log_config"
+
+config DGUS2_RX_THREAD_STACK_SIZE
+	int "DGUS2 RX Thread Stack Size"
+	default 2048
+	help
+	  Tamaño de la pila (en bytes) para el hilo receptor de procesamiento de tramas DGUS II.
+
+config DGUS2_RX_THREAD_PRIORITY
+	int "DGUS2 RX Thread Priority"
+	default 5
+	help
+	  Prioridad del hilo receptor de tramas DGUS II.
+
+config DGUS2_RING_BUFFER_SIZE
+	int "DGUS2 UART Ring Buffer Size"
+	default 512
+	help
+	  Tamaño del buffer circular (en bytes) para almacenar caracteres entrantes de la ISR UART.
+
+config DGUS2_MAX_SUBSCRIBERS
+	int "DGUS2 Maximum VP Subscribers"
+	default 16
+	help
+	  Cantidad máxima de callbacks asíncronos que pueden registrarse para eventos touch de VP.
+
+config DGUS2_CRC
+	bool "DGUS2 CRC-16 Checksum Verification Support"
+	default n
+	help
+	  Habilita el soporte de cálculo y verificación de CRC-16 Modbus (polinomio 0xA001,
+	  init 0xFFFF) en las tramas del protocolo DGUS II (T5L).
+	  Permite validar la integridad de tramas con checksum opcional de 2 bytes.
+
+endif # DGUS2_DRIVER

@@ -30,3 +30,17 @@
 *.exe
 *.out
 *.app
+
+#build files and folders
+/build*
+/tests_build*
+
+/twister-out*
+__pycache__/
+
+# docs
+/doc/_build*
+
+#
+.venv/
+temp/

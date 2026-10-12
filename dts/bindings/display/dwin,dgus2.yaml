@@ -1,0 +1,21 @@
+# Copyright (c) 2026 DAECGE TECNA SMART LAB
+# SPDX-License-Identifier: Apache-2.0
+
+description: DWIN DGUS II UART Intelligent Display Driver
+
+compatible: "dwin,dgus2"
+
+properties:
+  uart:
+    type: phandle
+    required: true
+    description: UART device controller phandle (e.g. &usart1, &usart2).
+
+  current-speed:
+    type: int
+    default: 115200
+    description: Initial baud rate.
+
+  reset-gpios:
+    type: phandle-array
+    description: Optional reset GPIO pin.
