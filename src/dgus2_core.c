@@ -20,7 +20,6 @@ LOG_MODULE_REGISTER(dgus2, CONFIG_DGUS2_LOG_LEVEL);
 
 #define DT_DRV_COMPAT dwin_dgus2
 
-
 /*
  * Despacho de tramas y procesamiento en hilo receptor
  */
@@ -56,7 +55,8 @@ static void dgus2_dispatch_frame(const struct device *dev, const struct dgus2_fr
 	k_mutex_unlock(&data->sub_mutex);
 
 	for (size_t i = 0; i < match_count; i++) {
-		matched_subs[i].cb(frame->vp_addr, frame->data, frame->data_len, matched_subs[i].user_data);
+		matched_subs[i].cb(frame->vp_addr, frame->data, frame->data_len,
+				   matched_subs[i].user_data);
 	}
 }
 
@@ -117,10 +117,10 @@ int dgus2_init(const struct device *dev)
 	data->sync_target_vp = 0xFFFF;
 	data->subscriber_count = 0;
 
-	data->rx_tid = k_thread_create(&data->rx_thread, data->rx_stack,
-				       K_KERNEL_STACK_SIZEOF(data->rx_stack),
-				       dgus2_rx_thread, (void *)dev, NULL, NULL,
-				       CONFIG_DGUS2_RX_THREAD_PRIORITY, 0, K_NO_WAIT);
+	data->rx_tid =
+		k_thread_create(&data->rx_thread, data->rx_stack,
+				K_KERNEL_STACK_SIZEOF(data->rx_stack), dgus2_rx_thread, (void *)dev,
+				NULL, NULL, CONFIG_DGUS2_RX_THREAD_PRIORITY, 0, K_NO_WAIT);
 
 	k_thread_name_set(&data->rx_thread, "dgus2_rx");
 	data->initialized = true;
@@ -128,7 +128,8 @@ int dgus2_init(const struct device *dev)
 	return 0;
 }
 
-int dgus2_write_vp_bytes(const struct device *dev, uint16_t vp_addr, const uint8_t *data, uint16_t len)
+int dgus2_write_vp_bytes(const struct device *dev, uint16_t vp_addr, const uint8_t *data,
+			 uint16_t len)
 {
 	if (!dev || !data) {
 		return -EINVAL;
@@ -137,7 +138,8 @@ int dgus2_write_vp_bytes(const struct device *dev, uint16_t vp_addr, const uint8
 	uint8_t tx_buf[DGUS2_MAX_PAYLOAD_LEN + 10];
 	size_t tx_len = 0;
 
-	int ret = dgus2_protocol_build_write_vp(tx_buf, sizeof(tx_buf), &tx_len, vp_addr, data, len);
+	int ret =
+		dgus2_protocol_build_write_vp(tx_buf, sizeof(tx_buf), &tx_len, vp_addr, data, len);
 	if (ret < 0) {
 		return ret;
 	}
@@ -272,7 +274,8 @@ int dgus2_read_vp_sync(const struct device *dev, uint16_t vp_addr, uint8_t *out_
 		return -ETIMEDOUT;
 	}
 
-	uint16_t copy_len = data->sync_frame.data_len > max_len ? max_len : data->sync_frame.data_len;
+	uint16_t copy_len =
+		data->sync_frame.data_len > max_len ? max_len : data->sync_frame.data_len;
 	memcpy(out_buf, data->sync_frame.data, copy_len);
 	*out_len = copy_len;
 
@@ -283,7 +286,8 @@ int dgus2_read_vp_sync(const struct device *dev, uint16_t vp_addr, uint8_t *out_
 	return 0;
 }
 
-int dgus2_read_vp_u16_sync(const struct device *dev, uint16_t vp_addr, uint16_t *value, k_timeout_t timeout)
+int dgus2_read_vp_u16_sync(const struct device *dev, uint16_t vp_addr, uint16_t *value,
+			   k_timeout_t timeout)
 {
 	if (!dev || !value) {
 		return -EINVAL;
@@ -304,7 +308,8 @@ int dgus2_read_vp_u16_sync(const struct device *dev, uint16_t vp_addr, uint16_t 
 	return 0;
 }
 
-int dgus2_read_vp_u32_sync(const struct device *dev, uint16_t vp_addr, uint32_t *value, k_timeout_t timeout)
+int dgus2_read_vp_u32_sync(const struct device *dev, uint16_t vp_addr, uint32_t *value,
+			   k_timeout_t timeout)
 {
 	if (!dev || !value) {
 		return -EINVAL;
@@ -333,8 +338,7 @@ int dgus2_set_page(const struct device *dev, uint16_t page_id)
 
 	/* DGUS II exige 4 bytes para cambio de página: 0x5A 0x01 [PAGE_MSB] [PAGE_LSB] */
 	uint8_t payload[4];
-	payload[0] = 0x5A;
-	payload[1] = 0x01;
+	sys_put_be16(DGUS2_PAGE_SWITCH_MAGIC, &payload[0]);
 	sys_put_be16(page_id, &payload[2]);
 	return dgus2_write_vp_bytes(dev, DGUS2_VP_SYSTEM_PAGE, payload, sizeof(payload));
 }
@@ -366,10 +370,12 @@ int dgus2_get_page_sync(const struct device *dev, uint16_t *page_id, k_timeout_t
 	uint16_t rx_len = 0;
 
 	/* Consultar el VP 0x0014 o VP 0x0084 */
-	int ret = dgus2_read_vp_sync(dev, DGUS2_VP_CURRENT_PAGE, buf, sizeof(buf), &rx_len, timeout);
+	int ret =
+		dgus2_read_vp_sync(dev, DGUS2_VP_CURRENT_PAGE, buf, sizeof(buf), &rx_len, timeout);
 	if (ret < 0) {
 		/* Intentar fallback leyendo VP 0x0084 */
-		ret = dgus2_read_vp_sync(dev, DGUS2_VP_SYSTEM_PAGE, buf, sizeof(buf), &rx_len, timeout);
+		ret = dgus2_read_vp_sync(dev, DGUS2_VP_SYSTEM_PAGE, buf, sizeof(buf), &rx_len,
+					 timeout);
 		if (ret < 0) {
 			return ret;
 		}
@@ -400,16 +406,18 @@ int dgus2_trigger_buzzer(const struct device *dev, uint16_t duration_ms)
 	return dgus2_write_vp_bytes(dev, DGUS2_VP_SYSTEM_BUZZER, payload, sizeof(payload));
 }
 
-int dgus2_write_curve(const struct device *dev, uint8_t channel, const uint16_t *points, uint16_t count)
+int dgus2_write_curve(const struct device *dev, uint8_t channel, const uint16_t *points,
+		      uint16_t count)
 {
-	if (!dev || !points || count == 0) {
+	if (!dev || !points || count == 0 || (count * 2) > (DGUS2_MAX_PAYLOAD_LEN - 4)) {
 		return -EINVAL;
 	}
 
 	uint8_t tx_buf[DGUS2_MAX_PAYLOAD_LEN + 10];
 	size_t tx_len = 0;
 
-	int ret = dgus2_protocol_build_write_curve(tx_buf, sizeof(tx_buf), &tx_len, channel, points, count);
+	int ret = dgus2_protocol_build_write_curve(tx_buf, sizeof(tx_buf), &tx_len, channel, points,
+						   count);
 	if (ret < 0) {
 		return ret;
 	}
@@ -417,8 +425,8 @@ int dgus2_write_curve(const struct device *dev, uint8_t channel, const uint16_t 
 	return dgus2_hal_tx_bytes(dev, tx_buf, tx_len);
 }
 
-int dgus2_register_vp_callback(const struct device *dev, uint16_t vp_addr,
-			       dgus2_vp_event_cb_t cb, void *user_data)
+int dgus2_register_vp_callback(const struct device *dev, uint16_t vp_addr, dgus2_vp_event_cb_t cb,
+			       void *user_data)
 {
 	if (!dev || !cb) {
 		return -EINVAL;
@@ -444,8 +452,7 @@ int dgus2_register_vp_callback(const struct device *dev, uint16_t vp_addr,
 	return 0;
 }
 
-int dgus2_unregister_vp_callback(const struct device *dev, uint16_t vp_addr,
-				 dgus2_vp_event_cb_t cb)
+int dgus2_unregister_vp_callback(const struct device *dev, uint16_t vp_addr, dgus2_vp_event_cb_t cb)
 {
 	if (!dev || !cb) {
 		return -EINVAL;
@@ -458,9 +465,8 @@ int dgus2_unregister_vp_callback(const struct device *dev, uint16_t vp_addr,
 
 	bool found = false;
 	k_mutex_lock(&data->sub_mutex, K_FOREVER);
-	for (size_t i = 0; i < data->subscriber_count; ) {
-		if (data->subscribers[i].vp_addr == vp_addr &&
-		    data->subscribers[i].cb == cb) {
+	for (size_t i = 0; i < data->subscriber_count;) {
+		if (data->subscribers[i].vp_addr == vp_addr && data->subscribers[i].cb == cb) {
 			found = true;
 			for (size_t j = i; j < data->subscriber_count - 1; j++) {
 				data->subscribers[j] = data->subscribers[j + 1];
@@ -492,19 +498,12 @@ uint32_t dgus2_get_parse_error_count(const struct device *dev)
 /*
  * Registro Canónico Multi-Instancia de Dispositivos Zephyr
  */
-#define DGUS2_DEVICE_INIT(inst)                                             \
-	static struct dgus2_data dgus2_data_##inst;                         \
-	static const struct dgus2_config dgus2_config_##inst = {             \
-		.uart_dev = DEVICE_DT_GET(DT_INST_PHANDLE(inst, uart)),     \
-	};                                                                  \
-	DEVICE_DT_INST_DEFINE(inst,                                         \
-			      dgus2_init,                                   \
-			      NULL,                                         \
-			      &dgus2_data_##inst,                           \
-			      &dgus2_config_##inst,                         \
-			      POST_KERNEL,                                  \
-			      CONFIG_APPLICATION_INIT_PRIORITY,             \
-			      NULL);
+#define DGUS2_DEVICE_INIT(inst)                                                                    \
+	static struct dgus2_data dgus2_data_##inst;                                                \
+	static const struct dgus2_config dgus2_config_##inst = {                                   \
+		.uart_dev = DEVICE_DT_GET(DT_INST_PHANDLE(inst, uart)),                            \
+	};                                                                                         \
+	DEVICE_DT_INST_DEFINE(inst, dgus2_init, NULL, &dgus2_data_##inst, &dgus2_config_##inst,    \
+			      POST_KERNEL, CONFIG_APPLICATION_INIT_PRIORITY, NULL);
 
 DT_INST_FOREACH_STATUS_OKAY(DGUS2_DEVICE_INIT)
-

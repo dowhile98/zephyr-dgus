@@ -54,7 +54,7 @@ ZTEST(protocol_parser, test_parse_single_valid_frame)
 {
 	struct dgus2_parser parser;
 	struct dgus2_frame frame;
-	const uint8_t raw[] = { 0x5A, 0xA5, 0x05, 0x82, 0x10, 0x00, 0xAA, 0xBB };
+	const uint8_t raw[] = {0x5A, 0xA5, 0x05, 0x82, 0x10, 0x00, 0xAA, 0xBB};
 
 	dgus2_protocol_parser_init(&parser);
 
@@ -72,7 +72,8 @@ ZTEST(protocol_parser, test_parse_single_valid_frame)
 	zassert_equal(frame.data_len, 2, "Data length mismatch: got %u", frame.data_len);
 	zassert_equal(frame.data[0], 0xAA, "Data[0] mismatch: got 0x%02X", frame.data[0]);
 	zassert_equal(frame.data[1], 0xBB, "Data[1] mismatch: got 0x%02X", frame.data[1]);
-	zassert_equal(parser.state, DGUS2_STATE_WAIT_HEADER1, "FSM state must reset to WAIT_HEADER1");
+	zassert_equal(parser.state, DGUS2_STATE_WAIT_HEADER1,
+		      "FSM state must reset to WAIT_HEADER1");
 	zassert_equal(parser.parse_errors, 0, "No parse errors expected");
 }
 
@@ -86,10 +87,8 @@ ZTEST(protocol_parser, test_parse_noise_recovery)
 {
 	struct dgus2_parser parser;
 	struct dgus2_frame frame;
-	const uint8_t stream[] = {
-		0xFF, 0x00, 0x7E, 0x12, 0x34, 0xAA,
-		0x5A, 0xA5, 0x03, 0x82, 0x20, 0x00
-	};
+	const uint8_t stream[] = {0xFF, 0x00, 0x7E, 0x12, 0x34, 0xAA,
+				  0x5A, 0xA5, 0x03, 0x82, 0x20, 0x00};
 
 	dgus2_protocol_parser_init(&parser);
 
@@ -117,7 +116,7 @@ ZTEST(protocol_parser, test_parse_repeated_header1)
 {
 	struct dgus2_parser parser;
 	struct dgus2_frame frame;
-	const uint8_t stream[] = { 0x5A, 0x5A, 0xA5, 0x03, 0x82, 0x10, 0x00 };
+	const uint8_t stream[] = {0x5A, 0x5A, 0xA5, 0x03, 0x82, 0x10, 0x00};
 
 	dgus2_protocol_parser_init(&parser);
 
@@ -145,7 +144,7 @@ ZTEST(protocol_parser, test_parse_invalid_length_too_short)
 {
 	struct dgus2_parser parser;
 	struct dgus2_frame frame;
-	const uint8_t raw[] = { 0x5A, 0xA5, 0x02 };
+	const uint8_t raw[] = {0x5A, 0xA5, 0x02};
 
 	dgus2_protocol_parser_init(&parser);
 
@@ -169,7 +168,7 @@ ZTEST(protocol_parser, test_parse_invalid_length_too_long)
 {
 	struct dgus2_parser parser;
 	struct dgus2_frame frame;
-	const uint8_t raw[] = { 0x5A, 0xA5, 0xFE }; /* LEN = 254 */
+	const uint8_t raw[] = {0x5A, 0xA5, 0xFE}; /* LEN = 254 */
 
 	dgus2_protocol_parser_init(&parser);
 
@@ -192,8 +191,8 @@ ZTEST(protocol_parser, test_parse_fragmented_stream)
 {
 	struct dgus2_parser parser;
 	struct dgus2_frame frame;
-	const uint8_t frame1[] = { 0x5A, 0xA5, 0x04, 0x82, 0x10, 0x00, 0x11 };
-	const uint8_t frame2[] = { 0x5A, 0xA5, 0x05, 0x82, 0x20, 0x00, 0x22, 0x33 };
+	const uint8_t frame1[] = {0x5A, 0xA5, 0x04, 0x82, 0x10, 0x00, 0x11};
+	const uint8_t frame2[] = {0x5A, 0xA5, 0x05, 0x82, 0x20, 0x00, 0x22, 0x33};
 
 	dgus2_protocol_parser_init(&parser);
 
@@ -238,7 +237,7 @@ ZTEST(protocol_parser, test_parse_0x83_word_count)
 {
 	struct dgus2_parser parser;
 	struct dgus2_frame frame;
-	const uint8_t raw[] = { 0x5A, 0xA5, 0x06, 0x83, 0x10, 0x00, 0x01, 0x12, 0x34 };
+	const uint8_t raw[] = {0x5A, 0xA5, 0x06, 0x83, 0x10, 0x00, 0x01, 0x12, 0x34};
 
 	dgus2_protocol_parser_init(&parser);
 
@@ -268,7 +267,7 @@ ZTEST(protocol_parser, test_parse_write_ack_ok)
 {
 	struct dgus2_parser parser;
 	struct dgus2_frame frame;
-	const uint8_t raw[] = { 0x5A, 0xA5, 0x03, 0x82, 0x4F, 0x4B };
+	const uint8_t raw[] = {0x5A, 0xA5, 0x03, 0x82, 0x4F, 0x4B};
 
 	dgus2_protocol_parser_init(&parser);
 
@@ -295,7 +294,7 @@ ZTEST(protocol_parser, test_parse_write_reg_ack_ok)
 {
 	struct dgus2_parser parser;
 	struct dgus2_frame frame;
-	const uint8_t raw[] = { 0x5A, 0xA5, 0x03, 0x80, 0x4F, 0x4B };
+	const uint8_t raw[] = {0x5A, 0xA5, 0x03, 0x80, 0x4F, 0x4B};
 
 	dgus2_protocol_parser_init(&parser);
 
@@ -322,7 +321,7 @@ ZTEST(protocol_parser, test_parse_write_curve_ack_ok)
 {
 	struct dgus2_parser parser;
 	struct dgus2_frame frame;
-	const uint8_t raw[] = { 0x5A, 0xA5, 0x03, 0x84, 0x4F, 0x4B };
+	const uint8_t raw[] = {0x5A, 0xA5, 0x03, 0x84, 0x4F, 0x4B};
 
 	dgus2_protocol_parser_init(&parser);
 

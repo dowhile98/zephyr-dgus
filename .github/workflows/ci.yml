@@ -1,0 +1,117 @@
+# SPDX-License-Identifier: Apache-2.0
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+permissions:
+  contents: read
+
+jobs:
+  compliance:
+    name: Code Compliance
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install clang-format
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-format
+
+      - name: Check code formatting
+        run: |
+          clang-format --dry-run --Werror \
+            src/*.c src/*.h include/dgus2/*.h tests/src/*.c samples/dwin-interface/src/*.c
+
+  twister-tests:
+    name: Twister Tests (native_sim)
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/zephyrproject-rtos/ci:v0.27.4
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          path: zephyr-dgus
+
+      - name: Initialize West workspace
+        run: |
+          west init -l zephyr-dgus
+          west update --narrow --depth=1
+
+      - name: Run Twister Unit Tests
+        run: |
+          cd zephyr-dgus
+          west twister -T tests/ -p native_sim --verbose
+
+      - name: Upload Twister Test Artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: twister-reports
+          path: |
+            zephyr-dgus/twister-out/twister.json
+            zephyr-dgus/twister-out/twister_report.xml
+
+  sample-builds:
+    name: Sample Build (${{ matrix.target }})
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/zephyrproject-rtos/ci:v0.27.4
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - native_sim
+          - stm32f4_disco
+          - nucleo_f429zi
+          - nucleo_h753zi
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          path: zephyr-dgus
+
+      - name: Initialize West workspace
+        run: |
+          west init -l zephyr-dgus
+          west update --narrow --depth=1
+
+      - name: Build Sample Application
+        run: |
+          cd zephyr-dgus
+          west build -b ${{ matrix.target }} samples/dwin-interface/ -p auto
+
+  documentation:
+    name: Documentation Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install documentation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen graphviz
+          pip install -r doc/requirements.txt
+
+      - name: Build Documentation
+        run: |
+          ./scripts/build-docs.sh
+
+      - name: Upload HTML Documentation
+        uses: actions/upload-artifact@v4
+        with:
+          name: doc-html
+          path: doc/_build_sphinx/html/

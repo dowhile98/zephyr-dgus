@@ -17,7 +17,8 @@ LOG_MODULE_REGISTER(dwin_sample, LOG_LEVEL_INF);
 /*
  * Callback para eventos táctiles (VP 0x3000)
  */
-static void on_touch_button_press(uint16_t vp_addr, const uint8_t *data, uint16_t len, void *user_data)
+static void on_touch_button_press(uint16_t vp_addr, const uint8_t *data, uint16_t len,
+				  void *user_data)
 {
 	ARG_UNUSED(user_data);
 
@@ -92,7 +93,9 @@ int main(void)
 	uint16_t current_page = 0;
 	ret = dgus2_get_page_sync(dev, &current_page, K_MSEC(500));
 	if (ret < 0) {
-		LOG_INF("Sync page query timeout/unanswered (normal if no physical display attached): %d", ret);
+		LOG_INF("Sync page query timeout/unanswered (normal if no physical display "
+			"attached): %d",
+			ret);
 	} else {
 		LOG_INF("Sync page confirmed: %u", current_page);
 	}
@@ -131,11 +134,9 @@ int main(void)
 		uint32_t parse_errors = dgus2_get_parse_error_count(dev);
 
 		LOG_INF("Telemetry: Uptime=%us, Temp=%d.%d C, Press=%u hPa | Parse Errors=%u",
-			uptime_sec,
-			temp_celsius_x10 / 10,
+			uptime_sec, temp_celsius_x10 / 10,
 			(temp_celsius_x10 < 0 ? -temp_celsius_x10 : temp_celsius_x10) % 10,
-			pressure_hpa,
-			parse_errors);
+			pressure_hpa, parse_errors);
 
 		k_sleep(K_SECONDS(1));
 	}

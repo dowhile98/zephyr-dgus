@@ -2,7 +2,7 @@
 
 manifest:
   self:
-    path: zephyr-dwin
+    path: zephyr-dgus
 
   remotes:
     - name: zephyrproject-rtos

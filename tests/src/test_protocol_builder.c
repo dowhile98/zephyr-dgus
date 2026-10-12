@@ -18,15 +18,15 @@ ZTEST(protocol_builder, test_build_write_vp_valid)
 {
 	uint8_t buf[32];
 	size_t out_len = 0;
-	const uint8_t payload[] = { 0x01, 0x02 };
-	const uint8_t expected[] = { 0x5A, 0xA5, 0x05, 0x82, 0x10, 0x00, 0x01, 0x02 };
+	const uint8_t payload[] = {0x01, 0x02};
+	const uint8_t expected[] = {0x5A, 0xA5, 0x05, 0x82, 0x10, 0x00, 0x01, 0x02};
 
-	int ret = dgus2_protocol_build_write_vp(buf, sizeof(buf), &out_len,
-						0x1000, payload, sizeof(payload));
+	int ret = dgus2_protocol_build_write_vp(buf, sizeof(buf), &out_len, 0x1000, payload,
+						sizeof(payload));
 
 	zassert_equal(ret, 0, "Expected return 0, got %d", ret);
-	zassert_equal(out_len, sizeof(expected), "Expected len %zu, got %zu",
-		      sizeof(expected), out_len);
+	zassert_equal(out_len, sizeof(expected), "Expected len %zu, got %zu", sizeof(expected),
+		      out_len);
 	zassert_mem_equal(buf, expected, sizeof(expected), "Buffer content mismatch");
 }
 
@@ -40,10 +40,10 @@ ZTEST(protocol_builder, test_build_write_vp_buffer_overflow)
 {
 	uint8_t buf[7]; /* Needs 8 bytes for 2-byte payload */
 	size_t out_len = 0;
-	const uint8_t payload[] = { 0x01, 0x02 };
+	const uint8_t payload[] = {0x01, 0x02};
 
-	int ret = dgus2_protocol_build_write_vp(buf, sizeof(buf), &out_len,
-						0x1000, payload, sizeof(payload));
+	int ret = dgus2_protocol_build_write_vp(buf, sizeof(buf), &out_len, 0x1000, payload,
+						sizeof(payload));
 
 	zassert_equal(ret, -ENOBUFS, "Expected -ENOBUFS (%d), got %d", -ENOBUFS, ret);
 }
@@ -57,26 +57,26 @@ ZTEST(protocol_builder, test_build_write_vp_invalid_params)
 {
 	uint8_t buf[32];
 	size_t out_len = 0;
-	const uint8_t payload[] = { 0x01, 0x02 };
+	const uint8_t payload[] = {0x01, 0x02};
 
 	/* NULL output buffer */
-	int ret = dgus2_protocol_build_write_vp(NULL, sizeof(buf), &out_len,
-						0x1000, payload, sizeof(payload));
+	int ret = dgus2_protocol_build_write_vp(NULL, sizeof(buf), &out_len, 0x1000, payload,
+						sizeof(payload));
 	zassert_equal(ret, -EINVAL, "Expected -EINVAL for NULL buf, got %d", ret);
 
 	/* NULL out_len pointer */
-	ret = dgus2_protocol_build_write_vp(buf, sizeof(buf), NULL,
-					    0x1000, payload, sizeof(payload));
+	ret = dgus2_protocol_build_write_vp(buf, sizeof(buf), NULL, 0x1000, payload,
+					    sizeof(payload));
 	zassert_equal(ret, -EINVAL, "Expected -EINVAL for NULL out_len, got %d", ret);
 
 	/* NULL data pointer with data_len > 0 */
-	ret = dgus2_protocol_build_write_vp(buf, sizeof(buf), &out_len,
-					    0x1000, NULL, sizeof(payload));
-	zassert_equal(ret, -EINVAL, "Expected -EINVAL for NULL data with data_len > 0, got %d", ret);
+	ret = dgus2_protocol_build_write_vp(buf, sizeof(buf), &out_len, 0x1000, NULL,
+					    sizeof(payload));
+	zassert_equal(ret, -EINVAL, "Expected -EINVAL for NULL data with data_len > 0, got %d",
+		      ret);
 
 	/* NULL data with data_len == 0 is valid (0-length payload) */
-	ret = dgus2_protocol_build_write_vp(buf, sizeof(buf), &out_len,
-					    0x1000, NULL, 0);
+	ret = dgus2_protocol_build_write_vp(buf, sizeof(buf), &out_len, 0x1000, NULL, 0);
 	zassert_equal(ret, 0, "Expected 0 for data_len == 0, got %d", ret);
 	zassert_equal(out_len, 6, "Expected frame length 6 for 0 payload, got %zu", out_len);
 }
@@ -91,13 +91,13 @@ ZTEST(protocol_builder, test_build_read_vp_valid)
 {
 	uint8_t buf[32];
 	size_t out_len = 0;
-	const uint8_t expected[] = { 0x5A, 0xA5, 0x04, 0x83, 0x20, 0x00, 0x02 };
+	const uint8_t expected[] = {0x5A, 0xA5, 0x04, 0x83, 0x20, 0x00, 0x02};
 
 	int ret = dgus2_protocol_build_read_vp(buf, sizeof(buf), &out_len, 0x2000, 2);
 
 	zassert_equal(ret, 0, "Expected return 0, got %d", ret);
-	zassert_equal(out_len, sizeof(expected), "Expected len %zu, got %zu",
-		      sizeof(expected), out_len);
+	zassert_equal(out_len, sizeof(expected), "Expected len %zu, got %zu", sizeof(expected),
+		      out_len);
 	zassert_mem_equal(buf, expected, sizeof(expected), "Buffer content mismatch");
 }
 
@@ -154,15 +154,15 @@ ZTEST(protocol_builder, test_build_write_reg_valid)
 {
 	uint8_t buf[32];
 	size_t out_len = 0;
-	const uint8_t data[] = { 0x55 };
-	const uint8_t expected[] = { 0x5A, 0xA5, 0x04, 0x80, 0x00, 0x82, 0x55 };
+	const uint8_t data[] = {0x55};
+	const uint8_t expected[] = {0x5A, 0xA5, 0x04, 0x80, 0x00, 0x82, 0x55};
 
-	int ret = dgus2_protocol_build_write_reg(buf, sizeof(buf), &out_len,
-						 0x00, 0x82, data, sizeof(data));
+	int ret = dgus2_protocol_build_write_reg(buf, sizeof(buf), &out_len, 0x00, 0x82, data,
+						 sizeof(data));
 
 	zassert_equal(ret, 0, "Expected return 0, got %d", ret);
-	zassert_equal(out_len, sizeof(expected), "Expected len %zu, got %zu",
-		      sizeof(expected), out_len);
+	zassert_equal(out_len, sizeof(expected), "Expected len %zu, got %zu", sizeof(expected),
+		      out_len);
 	zassert_mem_equal(buf, expected, sizeof(expected), "Buffer content mismatch");
 }
 
@@ -173,10 +173,10 @@ ZTEST(protocol_builder, test_build_write_reg_buffer_overflow)
 {
 	uint8_t buf[6]; /* Needs 7 bytes for 1-byte payload */
 	size_t out_len = 0;
-	const uint8_t data[] = { 0x55 };
+	const uint8_t data[] = {0x55};
 
-	int ret = dgus2_protocol_build_write_reg(buf, sizeof(buf), &out_len,
-						 0x00, 0x82, data, sizeof(data));
+	int ret = dgus2_protocol_build_write_reg(buf, sizeof(buf), &out_len, 0x00, 0x82, data,
+						 sizeof(data));
 
 	zassert_equal(ret, -ENOBUFS, "Expected -ENOBUFS (%d), got %d", -ENOBUFS, ret);
 }
@@ -188,19 +188,20 @@ ZTEST(protocol_builder, test_build_write_reg_invalid_params)
 {
 	uint8_t buf[32];
 	size_t out_len = 0;
-	const uint8_t data[] = { 0x55 };
+	const uint8_t data[] = {0x55};
 
-	int ret = dgus2_protocol_build_write_reg(NULL, sizeof(buf), &out_len,
-						 0x00, 0x82, data, sizeof(data));
+	int ret = dgus2_protocol_build_write_reg(NULL, sizeof(buf), &out_len, 0x00, 0x82, data,
+						 sizeof(data));
 	zassert_equal(ret, -EINVAL, "Expected -EINVAL for NULL buf, got %d", ret);
 
-	ret = dgus2_protocol_build_write_reg(buf, sizeof(buf), NULL,
-					    0x00, 0x82, data, sizeof(data));
+	ret = dgus2_protocol_build_write_reg(buf, sizeof(buf), NULL, 0x00, 0x82, data,
+					     sizeof(data));
 	zassert_equal(ret, -EINVAL, "Expected -EINVAL for NULL out_len, got %d", ret);
 
-	ret = dgus2_protocol_build_write_reg(buf, sizeof(buf), &out_len,
-					    0x00, 0x82, NULL, sizeof(data));
-	zassert_equal(ret, -EINVAL, "Expected -EINVAL for NULL data with data_len > 0, got %d", ret);
+	ret = dgus2_protocol_build_write_reg(buf, sizeof(buf), &out_len, 0x00, 0x82, NULL,
+					     sizeof(data));
+	zassert_equal(ret, -EINVAL, "Expected -EINVAL for NULL data with data_len > 0, got %d",
+		      ret);
 }
 
 /**
@@ -212,15 +213,15 @@ ZTEST(protocol_builder, test_build_write_reg_page)
 {
 	uint8_t buf[32];
 	size_t out_len = 0;
-	const uint8_t data[] = { 0x55, 0xAA };
-	const uint8_t expected[] = { 0x5A, 0xA5, 0x05, 0x80, 0x01, 0x20, 0x55, 0xAA };
+	const uint8_t data[] = {0x55, 0xAA};
+	const uint8_t expected[] = {0x5A, 0xA5, 0x05, 0x80, 0x01, 0x20, 0x55, 0xAA};
 
-	int ret = dgus2_protocol_build_write_reg(buf, sizeof(buf), &out_len,
-						 0x01, 0x20, data, sizeof(data));
+	int ret = dgus2_protocol_build_write_reg(buf, sizeof(buf), &out_len, 0x01, 0x20, data,
+						 sizeof(data));
 
 	zassert_equal(ret, 0, "Expected return 0, got %d", ret);
-	zassert_equal(out_len, sizeof(expected), "Expected len %zu, got %zu",
-		      sizeof(expected), out_len);
+	zassert_equal(out_len, sizeof(expected), "Expected len %zu, got %zu", sizeof(expected),
+		      out_len);
 	zassert_mem_equal(buf, expected, sizeof(expected), "Buffer content mismatch");
 }
 
@@ -233,14 +234,13 @@ ZTEST(protocol_builder, test_build_read_reg)
 {
 	uint8_t buf[32];
 	size_t out_len = 0;
-	const uint8_t expected[] = { 0x5A, 0xA5, 0x04, 0x81, 0x00, 0x0A, 0x04 };
+	const uint8_t expected[] = {0x5A, 0xA5, 0x04, 0x81, 0x00, 0x0A, 0x04};
 
-	int ret = dgus2_protocol_build_read_reg(buf, sizeof(buf), &out_len,
-						0x00, 0x0A, 0x04);
+	int ret = dgus2_protocol_build_read_reg(buf, sizeof(buf), &out_len, 0x00, 0x0A, 0x04);
 
 	zassert_equal(ret, 0, "Expected return 0, got %d", ret);
-	zassert_equal(out_len, sizeof(expected), "Expected len %zu, got %zu",
-		      sizeof(expected), out_len);
+	zassert_equal(out_len, sizeof(expected), "Expected len %zu, got %zu", sizeof(expected),
+		      out_len);
 	zassert_mem_equal(buf, expected, sizeof(expected), "Buffer content mismatch");
 
 	/* Buffer overflow check: 7 bytes needed */
@@ -268,17 +268,14 @@ ZTEST(protocol_builder, test_build_write_curve)
 {
 	uint8_t buf[32];
 	size_t out_len = 0;
-	const uint16_t points[] = { 0x0010, 0x03E8 };
-	const uint8_t expected[] = {
-		0x5A, 0xA5, 0x06, 0x84, 0x01, 0x00, 0x10, 0x03, 0xE8
-	};
+	const uint16_t points[] = {0x0010, 0x03E8};
+	const uint8_t expected[] = {0x5A, 0xA5, 0x06, 0x84, 0x01, 0x00, 0x10, 0x03, 0xE8};
 
-	int ret = dgus2_protocol_build_write_curve(buf, sizeof(buf), &out_len,
-						   0x01, points, 2);
+	int ret = dgus2_protocol_build_write_curve(buf, sizeof(buf), &out_len, 0x01, points, 2);
 
 	zassert_equal(ret, 0, "Expected return 0, got %d", ret);
-	zassert_equal(out_len, sizeof(expected), "Expected len %zu, got %zu",
-		      sizeof(expected), out_len);
+	zassert_equal(out_len, sizeof(expected), "Expected len %zu, got %zu", sizeof(expected),
+		      out_len);
 	zassert_mem_equal(buf, expected, sizeof(expected), "Buffer content mismatch");
 
 	/* Buffer overflow check: 9 bytes needed */
@@ -312,12 +309,12 @@ ZTEST(protocol_builder, test_protocol_crc16)
 	zassert_equal(crc, 0x4B37, "Expected CRC 0x4B37 for 123456789, got 0x%04X", crc);
 
 	/* DGUS II Command vector 1: [83 00 0F 01] -> 0x90ED */
-	const uint8_t dgus_cmd1[] = { 0x83, 0x00, 0x0F, 0x01 };
+	const uint8_t dgus_cmd1[] = {0x83, 0x00, 0x0F, 0x01};
 	crc = dgus2_protocol_crc16(dgus_cmd1, sizeof(dgus_cmd1));
 	zassert_equal(crc, 0x90ED, "Expected CRC 0x90ED for read version cmd, got 0x%04X", crc);
 
 	/* DGUS II Command vector 2: [82 00 82 0A] -> 0xFBC8 */
-	const uint8_t dgus_cmd2[] = { 0x82, 0x00, 0x82, 0x0A };
+	const uint8_t dgus_cmd2[] = {0x82, 0x00, 0x82, 0x0A};
 	crc = dgus2_protocol_crc16(dgus_cmd2, sizeof(dgus_cmd2));
 	zassert_equal(crc, 0xFBC8, "Expected CRC 0xFBC8 for backlight cmd, got 0x%04X", crc);
 

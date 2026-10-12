@@ -1,12 +1,15 @@
-Welcome to Example Application's documentation!
-===============================================
+zephyr-dgus Documentation
+=========================
 
-This is a simple Sphinx documentation setup for ``example-application``.
+Welcome to the documentation for **zephyr-dgus**, the DWIN DGUS II smart display driver for Zephyr RTOS.
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents
 
+   overview
+   api
+   sample
    zephyr
 
 Indices and tables
