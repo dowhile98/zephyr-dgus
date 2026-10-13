@@ -33,8 +33,9 @@
 
 #build files and folders
 /build*
+/samples/dwin-interface/build*
 /tests_build*
-
+samples/dwin-interface/.vscode/
 /twister-out*
 __pycache__/
 

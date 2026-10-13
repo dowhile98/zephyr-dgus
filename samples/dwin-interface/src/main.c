@@ -45,22 +45,24 @@ int main(void) {
 	LOG_INF("Display device '%s' is ready", dev->name);
 
 	/* 2. Registro de callback para eventos táctiles */
-	ret = dgus2_register_vp_callback(dev, 0x3000, on_touch_button_press, NULL);
+	ret = dgus2_register_vp_callback(dev, 0x1002, on_touch_button_press, NULL);
 	if (ret < 0) {
-		LOG_WRN("Failed to register touch callback on VP 0x3000: %d", ret);
+		LOG_WRN("Failed to register touch callback on VP 0x1002: %d", ret);
 	} else {
-		LOG_INF("Touch callback registered on VP 0x3000");
+		LOG_INF("Touch callback registered on VP 0x1002");
 	}
 
 	/* 3. Secuencia de inicio de la pantalla */
 	LOG_INF("Starting display initialization sequence...");
 
-	/* Cambio a página 0 */
-	ret = dgus2_set_page(dev, 0);
+	/*WAIT*/
+	k_sleep(K_SECONDS(3));
+	/* Cambio a página 2 */
+	ret = dgus2_set_page(dev, 2);
 	if (ret < 0) {
 		LOG_WRN("dgus2_set_page failed: %d", ret);
 	} else {
-		LOG_INF("Active page set to 0");
+		LOG_INF("Active page set to 2");
 	}
 
 	/* Brillo al 85% */
@@ -114,7 +116,7 @@ int main(void) {
 		pressure_hpa = 1010 + (uint16_t)(uptime_sec % 7);
 
 		/* Telemetría a VP registers */
-		dgus2_write_vp_i16(dev, 0x1000, temp_celsius_x10);
+		dgus2_write_vp_i16(dev, 0x1012, temp_celsius_x10);
 		dgus2_write_vp_u16(dev, 0x1002, pressure_hpa);
 		dgus2_write_vp_u32(dev, 0x1004, uptime_sec);
 
